@@ -206,7 +206,7 @@ namespace _RAYSER.Scripts.UI
             catch (OperationCanceledException)
             {
                 // キャンセルされた場合の処理
-                Debug.Log("ShowUI Canceled");
+                Debug.Log("Show Canceled");
             }
         }
 

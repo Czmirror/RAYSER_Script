@@ -1,8 +1,9 @@
+using _RAYSER.Scripts.Bomb;
 using _RAYSER.Scripts.Item;
 using _RAYSER.Scripts.Score;
-using _RAYSER.Scripts.Weapon;
+using _RAYSER.Scripts.SubWeapon;
 using BGM.Volume;
-using Score;
+using MessagePipe;
 using VContainer;
 using VContainer.Unity;
 
@@ -14,10 +15,23 @@ namespace _RAYSER.Scripts.VContainer
         {
             base.Configure(builder);
 
-            // 子のLifetimeScopeに同じVolumeDataを引き渡す
+            // 子のLifetimeScopeに同じVolumeDataとScoreDataを引き渡す
             builder.Register<VolumeData>(Lifetime.Singleton);
             builder.Register<ScoreData>(Lifetime.Singleton);
+
+            // MessagePipeの設定
+            var messagePipeOptions = builder.RegisterMessagePipe();
+            builder.RegisterMessageBroker<ItemPurchaseSignal>(messagePipeOptions);
+            builder.RegisterMessageBroker<SubweaponMoveDirection>(messagePipeOptions);
+            builder.RegisterMessageBroker<ItemData>(messagePipeOptions);
+            builder.RegisterMessageBroker<SubweaponUseSignal>(messagePipeOptions);
+            builder.RegisterMessageBroker<BombUseSignal>(messagePipeOptions);
+            builder.RegisterMessageBroker<BombActiveSignal>(messagePipeOptions);
+
+            // ItemAcquisitionをシングルトンとして登録
             builder.Register<ItemAcquisition>(Lifetime.Singleton);
+
+            // SubWeaponMountedをシングルトンとして登録
             builder.Register<SubWeaponMounted>(Lifetime.Singleton);
         }
     }

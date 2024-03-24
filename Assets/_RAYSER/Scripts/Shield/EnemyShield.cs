@@ -65,5 +65,29 @@ namespace Shield
             var damage = _laser.AddDamage();
             ShieldReduction(damage);
         }
+
+        /// <summary>
+        /// 接触ダメージ処理の発火イベント
+        /// </summary>
+        /// <param name="collision">接触したゲームオブジェクト</param>
+        private void OnCollisionStay(Collision collision)
+        {
+            if (collision.gameObject.TryGetComponent(out IDamageableToEnemy damagetarget))
+            {
+                ShieldReduction(damagetarget.AddDamage());
+            }
+        }
+
+        /// <summary>
+        /// 貫通ダメージ処理の発火イベント
+        /// </summary>
+        /// <param name="other">貫通したゲームオブジェクト</param>
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.gameObject.TryGetComponent(out IDamageableToEnemy damagetarget))
+            {
+                ShieldReduction(damagetarget.AddDamage());
+            }
+        }
     }
 }

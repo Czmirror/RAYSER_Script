@@ -20,16 +20,24 @@ namespace InputSystem
 
         private void OnEnable()
         {
-            _playerInputActions.UI.Navigate.performed += OnNavigate;
-            _playerInputActions.UI.Navigate.canceled += OnNavigateStop;
-            _playerInputActions.UI.Cancel.canceled += OnCancel;
+            if (_playerInputActions == null)
+            {
+                Debug.LogError("_playerInputActions is null in OnEnable");
+                return;
+            }
+
+            // _playerInputActions.UI.Navigate.performed += OnNavigate;
+            // _playerInputActions.UI.Navigate.canceled += OnNavigateStop;
+            // _playerInputActions.UI.Cancel.canceled += OnCancel;
+            _playerInputActions.UI.Close.performed += OnCancel;
         }
 
         private void OnDisable()
         {
-            _playerInputActions.UI.Navigate.performed -= OnNavigate;
-            _playerInputActions.UI.Navigate.canceled -= OnNavigateStop;
-            _playerInputActions.UI.Cancel.canceled -= OnCancel;
+            // _playerInputActions.UI.Navigate.performed -= OnNavigate;
+            // _playerInputActions.UI.Navigate.canceled -= OnNavigateStop;
+            // _playerInputActions.UI.Cancel.canceled -= OnCancel;
+            _playerInputActions.UI.Close.performed -= OnCancel;
         }
 
         private void OnNavigate(InputAction.CallbackContext obj)

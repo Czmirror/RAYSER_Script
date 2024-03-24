@@ -1,7 +1,7 @@
 namespace _RAYSER.Scripts.Item
 {
     /// <summary>
-    /// アイテム種別
+    /// アイテム種別enum
     /// </summary>
     public enum ItemType
     {

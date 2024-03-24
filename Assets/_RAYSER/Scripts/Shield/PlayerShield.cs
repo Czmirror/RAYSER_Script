@@ -1,9 +1,11 @@
 using System;
 using System.Threading;
+using _RAYSER.Scripts.Bomb;
 using Cysharp.Threading.Tasks;
 using Damage;
 using Event;
 using Event.Signal;
+using MessagePipe;
 using Status;
 using UniRx;
 using UnityEngine;
@@ -68,6 +70,26 @@ namespace Shield
         /// ダメージ後無敵状態有効時間
         /// </summary>
         private float isDamageInvincibleTime = 3f;
+
+        private ISubscriber<BombActiveSignal> _bombActiveSubscriber;
+
+        public void Setup(ISubscriber<BombActiveSignal> bombActiveSubscriber)
+        {
+            bombActiveSubscriber.Subscribe(signal =>
+            {
+                switch (signal.BombActiveType)
+                {
+                    case BombActiveType.Active:
+                        // ボムがアクティブになった時にプレイヤーを無敵状態にする
+                        isEventInvincible = true;
+                        break;
+                    case BombActiveType.Inactive:
+                        // ボムの効果が終了した時に無敵状態を解除する
+                        isEventInvincible = false;
+                        break;
+                }
+            }).AddTo(this);
+        }
 
         private void Start()
         {

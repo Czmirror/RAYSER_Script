@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace _RAYSER.Scripts.UI.Modal
@@ -7,13 +8,13 @@ namespace _RAYSER.Scripts.UI.Modal
     /// </summary>
     public class EquipmentModal : MonoBehaviour, IModal
     {
-        public void Show()
+        public async UniTask Show()
         {
             // EquipmentModal固有の表示処理
             this.gameObject.SetActive(true);
         }
 
-        public void Hide()
+        public async UniTask Hide()
         {
             // EquipmentModal固有の非表示処理
             this.gameObject.SetActive(false);

@@ -1,3 +1,5 @@
+using System;
+
 namespace _RAYSER.Scripts.Score
 {
     /// <summary>
@@ -5,15 +7,25 @@ namespace _RAYSER.Scripts.Score
     /// </summary>
     public class ScoreData
     {
-        private int Score { get; set; }
+        private int _score;
+
+        /// <summary>
+        /// スコア更新イベント
+        /// </summary>
+        public event Action<int> OnScoreChanged;
+
         public int GetScore()
         {
-            return Score;
+            return _score;
         }
 
         public void SetScore(int score)
         {
-            Score = score;
+            if (_score != score)
+            {
+                _score = score;
+                OnScoreChanged?.Invoke(_score);
+            }
         }
     }
 }

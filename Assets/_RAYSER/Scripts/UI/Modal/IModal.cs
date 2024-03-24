@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+
 namespace _RAYSER.Scripts.UI.Modal
 {
     /// <summary>
@@ -7,12 +9,12 @@ namespace _RAYSER.Scripts.UI.Modal
         /// <summary>
         /// モーダル表示
         /// </summary>
-        void Show();
+        UniTask Show();
 
         /// <summary>
         /// モーダル非表示
         /// </summary>
-        void Hide();
+        UniTask Hide();
 
         /// <summary>
         /// 表示状態

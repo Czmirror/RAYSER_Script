@@ -1,4 +1,4 @@
-using UnityEngine.UI;
+using UnityEngine;
 
 namespace _RAYSER.Scripts.Item
 {
@@ -20,11 +20,18 @@ namespace _RAYSER.Scripts.Item
         /// <summary>
         /// アイテムアイコン
         /// </summary>
-        Image iconImage { get; }
+        Sprite iconImage { get; }
 
         /// <summary>
         /// アイテム種別
         /// </summary>
         ItemType itemType { get; }
+
+        /// <summary>
+        /// 必要スコア
+        /// </summary>
+        int requiredScore { get; }
+
+
     }
 }

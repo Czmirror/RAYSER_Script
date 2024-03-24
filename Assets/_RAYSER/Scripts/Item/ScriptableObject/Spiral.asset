@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fea84468f80d475d8f3eae569024f2e2, type: 3}
+  m_Name: Spiral
+  m_EditorClassIdentifier: 
+  itemName: Spiral
+  itemDescription: 
+  icon: {fileID: 21300000, guid: cb3d57b15478c4a1c9468a018d2d4ae5, type: 3}
+  _requiredScore: 40000
+  _itemType: 0
+  SubWeaponVisitor:
+    rid: 1483542808137564160
+  references:
+    version: 2
+    RefIds:
+    - rid: 1483542808137564160
+      type: {class: Spiral, ns: _RAYSER.Scripts.SubWeapon, asm: Assembly-CSharp}
+      data:
+        bulletPrefab: {fileID: -232572629339889138, guid: 4c71ca061976043dd9c2717429b4bb38,
+          type: 3}

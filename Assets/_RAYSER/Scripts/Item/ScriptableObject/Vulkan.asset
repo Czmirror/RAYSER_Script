@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fea84468f80d475d8f3eae569024f2e2, type: 3}
+  m_Name: Vulkan
+  m_EditorClassIdentifier: 
+  itemName: Vulkan
+  itemDescription: "\u30D0\u30EB\u30AB\u30F3"
+  icon: {fileID: 21300000, guid: 91f54bf81d2304320839d648b2678824, type: 3}
+  _requiredScore: 10000
+  _itemType: 0
+  SubWeaponVisitor:
+    rid: 1673070116013080583
+  references:
+    version: 2
+    RefIds:
+    - rid: 1673070116013080583
+      type: {class: Vulcan, ns: _RAYSER.Scripts.SubWeapon, asm: Assembly-CSharp}
+      data:
+        bulletPrefab: {fileID: 562301622203930337, guid: 30f3d11d2dc534f4a99984536d10cf14,
+          type: 3}

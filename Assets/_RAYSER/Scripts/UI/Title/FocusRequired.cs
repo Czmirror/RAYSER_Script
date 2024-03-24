@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Linq;
+using _RAYSER.Scripts.UI;
+using UniRx;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -30,12 +32,12 @@ namespace UI.Title
         [SerializeField] private GameObject[] NotSelectables;
 
         /// <summary>直前まで選択されていたオブジェクト。</summary>
-        private GameObject PreviousSelection = null;
+        [SerializeField] private GameObject PreviousSelection = null;
 
         /// <summary>
         /// 選択対象のオブジェクト一覧。
         /// </summary>
-        private GameObject[] _selectables;
+        [SerializeField] private GameObject[] _selectables;
 
         private void Awake()
         {
@@ -61,6 +63,22 @@ namespace UI.Title
                 hooker.Restrictor = this;
             }
 
+            // messagebrokerでselectorを受け取る _selectableGameObjectに選択されたオブジェクトを入れる（UIの選択がnullになってしまうことがあるため、それを回避するための処理）
+            MessageBroker.Default.Receive<UISelectorSignal>()
+                .Subscribe(x =>
+                {
+                    // SelectionHookerがアタッチされていない場合はアタッチする
+                    if (x.forcusUIGameObject.GetComponent<SelectionHooker>() == null)
+                    {
+                        var hooker = x.forcusUIGameObject.AddComponent<SelectionHooker>();
+                        hooker.Restrictor = this;
+
+                        // _selectablesに追加
+                        _selectables = _selectables.Append(x.forcusUIGameObject).ToArray();
+                    }
+                })
+                .AddTo(this);
+
             // フォーカス制御用コルーチンをスタート
             StartCoroutine(RestrictSelection());
         }
@@ -73,6 +91,8 @@ namespace UI.Title
         {
             while (true)
             {
+                // Debug.Log(EventSystem.current.currentSelectedGameObject);
+
                 // 別なオブジェクトを選択するまで待機
                 yield return new WaitUntil(
                     () => (EventSystem.current != null) &&

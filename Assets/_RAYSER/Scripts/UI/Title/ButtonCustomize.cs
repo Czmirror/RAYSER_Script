@@ -16,11 +16,6 @@ namespace _RAYSER.Scripts.UI.Title
         [SerializeField] private Button _button;
 
         /// <summary>
-        /// 閉じるボタン
-        /// </summary>
-        [SerializeField] private Button _closeButton;
-
-        /// <summary>
         /// メニューUI
         /// </summary>
         [SerializeField] private TitleMenuButtonsUI titleMenuButtonsUI;
@@ -45,19 +40,6 @@ namespace _RAYSER.Scripts.UI.Title
             _button.OnClickAsObservable().Subscribe(
                 _ => { PushButton(); }
             ).AddTo(this);
-            _closeButton.OnClickAsObservable().Subscribe(
-                _ => { PushCloseButton(); }
-            ).AddTo(this);
-        }
-
-        private void Start()
-        {
-            // ゲームパッドキャンセルボタン受付
-            MessageBroker.Default.Receive<GamePadCancelButtonPush>()
-                .Where(_ => _gamePadCancelButtonAcceptance)
-                .Subscribe(_ => PushCloseButton())
-                .AddTo(this);
-
         }
 
         private async UniTask PushButton()
@@ -67,15 +49,6 @@ namespace _RAYSER.Scripts.UI.Title
 
             await titleMenuButtonsUI.HideUI();
             await customizeWindowUI.ShowUI();
-        }
-
-        private async UniTask PushCloseButton()
-        {
-            // ゲームパッドのキャンセルボタン受付解除
-            _gamePadCancelButtonAcceptance = false;
-
-            await customizeWindowUI.HideUI();
-            await titleMenuButtonsUI.ShowUI();
         }
     }
 }
