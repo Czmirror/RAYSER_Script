@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace _RAYSER.Scripts.Bomb
 {
+    /// <summary>
+    /// ボム発射発動
+    /// </summary>
     public class BombTurret : MonoBehaviour, IDisposable
     {
         private ISubscriber<BombUseSignal> _bombUseSignalSubscriber;
@@ -16,17 +19,17 @@ namespace _RAYSER.Scripts.Bomb
             _bombUseSignalSubscriber = bombUseSignalSubscriber;
             var d = DisposableBag.CreateBuilder();
 
-            _bombVisitor = bombVisitor; // ボムのVisitorをセット
+            _bombVisitor = bombVisitor;
 
             // SubscribeメソッドでサブスクリプションをDisposableBagに追加
             _bombUseSignalSubscriber.Subscribe(signal =>
             {
                 Debug.Log("BombTurret: ボム使用シグナルを受け取りました");
-                // ボム使用のシグナルを受け取ったら、VisitorのUseメソッドを呼び出す
                 if (_bombVisitor.CanUse())
                 {
                     Debug.Log("BombTurret: ボムを使用します");
-                    _bombVisitor.Use(transform.position); // このオブジェクトの位置をUseメソッドに渡す
+                    var bombAction = new BombAction(transform.position);
+                    bombAction.Accept(_bombVisitor);
                 }
             }).AddTo(d);
             _bombUseSignalSubscriberDisposable = d.Build();

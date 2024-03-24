@@ -12,6 +12,9 @@ using UnityEngine;
 
 namespace Shield
 {
+    /// <summary>
+    /// 自機のシールド
+    /// </summary>
     public class PlayerShield : MonoBehaviour, IShield
     {
         [SerializeField] private GameObject player;

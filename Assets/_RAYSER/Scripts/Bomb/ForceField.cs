@@ -5,6 +5,9 @@ using MessagePipe;
 
 namespace _RAYSER.Scripts.Bomb
 {
+    /// <summary>
+    /// フォースフィールド : ボムの一種 Visitor
+    /// </summary>
     [System.Serializable]
     public class ForceField : IBombVisitor
     {
@@ -24,6 +27,11 @@ namespace _RAYSER.Scripts.Bomb
         public event Action<int> OnUseCountChanged;
 
         private IPublisher<BombActiveSignal> bombActiveSignalPublisher;
+
+        public void Visit(BombAction action)
+        {
+            Use(action.Position);
+        }
 
         public void SetPrefab(BombPrefab prefab)
         {

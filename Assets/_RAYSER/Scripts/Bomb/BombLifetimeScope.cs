@@ -8,6 +8,9 @@ using VContainer.Unity;
 
 namespace _RAYSER.Scripts.Bomb
 {
+    /// <summary>
+    /// ボムのライフタイムスコープ
+    /// </summary>
     public class BombLifetimeScope : LifetimeScope
     {
 

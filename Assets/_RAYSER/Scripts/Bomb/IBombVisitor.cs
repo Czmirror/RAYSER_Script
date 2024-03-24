@@ -8,6 +8,8 @@ namespace _RAYSER.Scripts.Bomb
     /// </summary>
     public interface IBombVisitor
     {
+        void Visit(BombAction action);
+
         bool CanUse();
         void Use(Vector3 position);
         void Reset();
