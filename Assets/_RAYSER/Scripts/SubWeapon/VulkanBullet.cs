@@ -41,7 +41,7 @@ namespace _RAYSER.Scripts.SubWeapon
         }
 
         private void Update(){
-            _rigidbody.velocity = transform.forward.normalized * beamSpeed;
+            _rigidbody.linearVelocity = transform.forward.normalized * beamSpeed;
         }
     }
 }

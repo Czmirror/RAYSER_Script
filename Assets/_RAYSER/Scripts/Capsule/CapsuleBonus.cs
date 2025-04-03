@@ -10,6 +10,9 @@ namespace Capsule
     /// </summary>
     public class CapsuleBonus : MonoBehaviour, ICapsuleinfo
     {
+        [SerializeField] private string _name = "BonusScore";
+        public string Name => _name;
+
         [SerializeField] private CapsuleEnum capsuleEnum = CapsuleEnum.BonusScore;
 
         [SerializeField] private AudioSource _audioSource;

@@ -8,6 +8,11 @@ namespace Capsule
     public interface ICapsuleinfo
     {
         /// <summary>
+        /// カプセル名
+        /// </summary>
+        string Name { get; }
+
+        /// <summary>
         /// アイテム回収
         /// </summary>
         void CapsuleRecovery();

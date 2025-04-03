@@ -9,6 +9,9 @@ namespace Capsule
     /// </summary>
     public class CapsuleShieldRecover : MonoBehaviour, ICapsuleinfo
     {
+        [SerializeField] private string _name = "ShieldRecover";
+        public string Name => _name;
+
         [SerializeField] private CapsuleEnum capsuleEnum = CapsuleEnum.ShieldRecover;
         [SerializeField] private float shieldRecoverPoint = 30;
 

@@ -1,54 +1,195 @@
 using System;
+using System.Collections.Generic;
+using _RAYSER.Scripts.Event.Signal;
 using DG.Tweening;
 using Event.Signal;
 using TMPro;
 using UniRx;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace UI.Game
 {
     public class TalkUI : MonoBehaviour
     {
+        [Header("UI References")]
         [SerializeField] private RectTransform talkUIRectTransform;
         [SerializeField] private CanvasGroup talkUICanvasGroup;
         [SerializeField] private CanvasGroup talkWindowUICanvasGroup;
         [SerializeField] private CanvasGroup roydFaceWindowCanvasGroup;
         [SerializeField] private CanvasGroup sophieFaceWindowCanvasGroup;
+        [SerializeField] private TextMeshProUGUI talkTextMeshPro;
+
+        [Header("ScriptableObjects for each scenario")]
+        [SerializeField] private TalkConversation stage1BossConversation;
+        [SerializeField] private TalkConversation stage2IntervalConversation;
+        [SerializeField] private TalkConversation stage2BossConversation;
+        [SerializeField] private TalkConversation stage3IntervalConversation;
+        [SerializeField] private TalkConversation gameClearConversation;
+        [SerializeField] private TalkConversation tutorialStartConversation;
+        [SerializeField] private TalkConversation tutorialLaserConversation;
+        [SerializeField] private TalkConversation tutorialItemConversation;
+        [SerializeField] private TalkConversation tutorialSubWeaponConversation;
+        [SerializeField] private TalkConversation tutorialBombConversation;
+        [SerializeField] private TalkConversation tutorialEndConversation;
 
         private Vector3 talkUIPosition;
         private Vector3 _outUIPosition;
-        [SerializeField] private TextMeshProUGUI talkTextMeshPro;
+
         private String _messege;
-        private float _message_speed = 0.05f;
+        private float _messageSpeed = 0.05f;
+
+        /// <summary>
+        /// キャラクターごとの FaceWindow を一括で管理するための辞書
+        /// </summary>
+        private Dictionary<TalkCharacter, CanvasGroup> faceWindowMap = new Dictionary<TalkCharacter, CanvasGroup>();
+
+        /// <summary>
+        /// 今アクティブなキャラクターの CanvasGroup
+        /// </summary>
+        private CanvasGroup currentActiveFace;
 
         private void Start()
         {
             talkUIPosition = talkUIRectTransform.localPosition;
             InitializeUI();
 
+            // FaceWindow をキャラクターごとに辞書にセットしておく
+            faceWindowMap[TalkCharacter.Royd] = roydFaceWindowCanvasGroup;
+            faceWindowMap[TalkCharacter.Sophie] = sophieFaceWindowCanvasGroup;
+
+            MessageBroker.Default.Receive<TutorialStart>()
+                .Where(x => x._talk == TalkEnum.TalkStart)
+                .Subscribe(_ =>
+                {
+                    StartConversation(tutorialStartConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new TutorialStart(TalkEnum.TalkEnd));
+                            MessageBroker.Default.Publish(new TutorialMove());
+                        });
+                })
+                .AddTo(this);
+
+            MessageBroker.Default.Receive<TutorialLaser>()
+                .Where(x => x._talk == TalkEnum.TalkStart)
+                .Subscribe(_ =>
+                {
+                    StartConversation(tutorialLaserConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new TutorialLaser(TalkEnum.TalkEnd));
+                        });
+                })
+                .AddTo(this);
+
+            MessageBroker.Default.Receive<TutorialItem>()
+                .Where(x => x._talk == TalkEnum.TalkStart)
+                .Subscribe(_ =>
+                {
+                    StartConversation(tutorialItemConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new TutorialItem(TalkEnum.TalkEnd));
+                        });
+                })
+                .AddTo(this);
+
+            MessageBroker.Default.Receive<TutorialSubWeapon>()
+                .Where(x => x._talk == TalkEnum.TalkStart)
+                .Subscribe(_ =>
+                {
+                    StartConversation(tutorialSubWeaponConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new TutorialSubWeapon(TalkEnum.TalkEnd));
+                        });
+                })
+                .AddTo(this);
+
+            MessageBroker.Default.Receive<TutorialBomb>()
+                .Where(x => x._talk == TalkEnum.TalkStart)
+                .Subscribe(_ =>
+                {
+                    StartConversation(tutorialBombConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new TutorialBomb(TalkEnum.TalkEnd));
+                        });
+                })
+                .AddTo(this);
+
+            MessageBroker.Default.Receive<TutorialEnd>()
+                .Where(x => x._talk == TalkEnum.TalkStart)
+                .Subscribe(_ =>
+                {
+                    StartConversation(tutorialEndConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new TutorialEnd(TalkEnum.TalkEnd));
+                            SceneManager.LoadScene("Game");
+                        });
+                })
+                .AddTo(this);
+
             MessageBroker.Default.Receive<Stage1BossEncounter>()
                 .Where(x => x._talk == TalkEnum.TalkStart)
-                .Subscribe(x => Stage1BossTalk())
+                .Subscribe(x =>
+                {
+                    StartConversation(stage1BossConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new Stage1BossEncounter(TalkEnum.TalkEnd));
+                        });
+                })
                 .AddTo(this);
 
             MessageBroker.Default.Receive<Stage2IntervalStart>()
                 .Where(x => x._talk == TalkEnum.TalkStart)
-                .Subscribe(x => Stage2IntervalTalk())
+                .Subscribe(x =>
+                {
+                    StartConversation(stage2IntervalConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new Stage2IntervalStart(TalkEnum.TalkEnd));
+                        });
+                })
                 .AddTo(this);
 
             MessageBroker.Default.Receive<Stage2BossEncounter>()
                 .Where(x => x._talk == TalkEnum.TalkStart)
-                .Subscribe(x => Stage2BossTalk())
+                .Subscribe(x =>
+                {
+                    StartConversation(stage2BossConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new Stage2BossEncounter(TalkEnum.TalkEnd));
+                        });
+                })
                 .AddTo(this);
 
             MessageBroker.Default.Receive<Stage3IntervalStart>()
                 .Where(x => x._talk == TalkEnum.TalkStart)
-                .Subscribe(x => Stage3IntervalTalk())
+                .Subscribe(x =>
+                {
+                    StartConversation(stage3IntervalConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new Stage3IntervalStart(TalkEnum.TalkEnd));
+                        });
+                })
                 .AddTo(this);
 
             MessageBroker.Default.Receive<GameClear>()
                 .Where(x => x._talk == TalkEnum.TalkStart)
-                .Subscribe(x => GameClearTalk())
+                .Subscribe(x =>
+                {
+                    StartConversation(gameClearConversation,
+                        onComplete: () =>
+                        {
+                            MessageBroker.Default.Publish(new GameClear(TalkEnum.TalkEnd));
+                        });
+                })
                 .AddTo(this);
         }
 
@@ -99,151 +240,74 @@ namespace UI.Game
             sequence.Restart();
         }
 
-        private void Stage1BossTalk()
+        /// <summary>
+        /// 共通の会話再生メソッド
+        /// </summary>
+        /// <param name="conversation">ScriptableObject で定義した会話データ</param>
+        /// <param name="onComplete">会話終了時のコールバック</param>
+        private void StartConversation(TalkConversation conversation, Action onComplete = null)
         {
             var sequence = TalkStart();
 
-            _messege = "ロイド、敵の迎撃部隊よ！気をつけて！";
-            sequence
-                .Append(talkWindowUICanvasGroup.DOFade(1f, 0.5f))
-                .Join(sophieFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f);
+            // 会話ウィンドウをフェードイン
+            sequence.Append(talkWindowUICanvasGroup.DOFade(1f, 0.5f));
 
-            _messege = "了解、これより敵迎撃部隊と交戦する。";
-            sequence
-                .Append(sophieFaceWindowCanvasGroup.DOFade(0f, 0.5f))
-                .Append(roydFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f)
-                .OnComplete(() => MessageBroker.Default.Publish(new Stage1BossEncounter(TalkEnum.TalkEnd)));
+            // ScriptableObject に定義された会話分だけループしてシーケンスを積み上げる
+            foreach (var sentence in conversation.Sentences)
+            {
+                // キャラクターの切り替え
+                var fadeList = SwitchFaceWindow(sentence.Character);
+                foreach (var fade in fadeList)
+                {
+                    sequence.Append(fade);
+                }
 
-            Finalization(sequence);
-        }
+                // テキストをクリアしてから新しい文章を表示
+                sequence.Append(talkTextMeshPro.DOText(string.Empty, 0f));
+                sequence.Append(talkTextMeshPro.DOText(sentence.Message, sentence.Message.Length * _messageSpeed)
+                    .SetEase(Ease.Linear));
 
-        private void Stage2IntervalTalk()
-        {
-            var sequence = TalkStart();
+                // 文章ごとに少し間を取る
+                sequence.AppendInterval(0.5f);
+            }
 
-            _messege = "ソフィー、この辺りの敵勢力を撃破した。";
-            sequence
-                .Append(talkWindowUICanvasGroup.DOFade(1f, 0.5f))
-                .Join(roydFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f);
+            // 全文表示し終わったら onComplete を実行
+            sequence.OnComplete(() =>
+            {
+                onComplete?.Invoke();
+            });
 
-            _messege = "了解ロイド、それでは武装の少ない敵戦艦の側部から回り込んで、戦艦の後方部へ向かって。";
-            sequence
-                .Append(roydFaceWindowCanvasGroup.DOFade(0f, 0.5f))
-                .Append(sophieFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f);
-
-            _messege = "了解、これより敵戦艦側部から侵攻を開始する。";
-            sequence
-                .Append(sophieFaceWindowCanvasGroup.DOFade(0f, 0.5f))
-                .Append(roydFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f)
-                .OnComplete(() => MessageBroker.Default.Publish(new Stage2IntervalStart(TalkEnum.TalkEnd)));
-
-            Finalization(sequence);
-        }
-
-        private void Stage2BossTalk()
-        {
-            var sequence = TalkStart();
-
-            _messege = "ロイド、敵戦艦からの迎撃部隊が発進されたわ！気をつけて！";
-            sequence
-                .Append(talkWindowUICanvasGroup.DOFade(1f, 0.5f))
-                .Join(sophieFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f);
-
-            _messege = "了解、これより敵迎撃部隊と交戦する。";
-            sequence
-                .Append(sophieFaceWindowCanvasGroup.DOFade(0f, 0.5f))
-                .Append(roydFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f)
-                .OnComplete(() => MessageBroker.Default.Publish(new Stage2BossEncounter(TalkEnum.TalkEnd)));
-
-            Finalization(sequence);
-        }
-
-        private void Stage3IntervalTalk()
-        {
-            var sequence = TalkStart();
-
-            _messege = "ソフィー、敵戦艦の後方部へ到着した。";
-            sequence
-                .Append(talkWindowUICanvasGroup.DOFade(1f, 0.5f))
-                .Join(roydFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f);
-
-            _messege = "了解ロイド、敵戦艦の動力部をなんとか破壊して、そうすれば主力部隊が追いつけるようになるわ。";
-            sequence
-                .Append(roydFaceWindowCanvasGroup.DOFade(0f, 0.5f))
-                .Append(sophieFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f);
-
-            _messege = "了解、これより敵戦艦動力部の破壊を試みる。";
-            sequence
-                .Append(sophieFaceWindowCanvasGroup.DOFade(0f, 0.5f))
-                .Append(roydFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f)
-                .OnComplete(() => MessageBroker.Default.Publish(new Stage3IntervalStart(TalkEnum.TalkEnd)));
-
+            // その後のフェードアウトなどの後処理
             Finalization(sequence);
         }
 
         /// <summary>
-        /// ゲームクリア会話
+        /// 顔ウィンドウをキャラクターごとに切り替える
         /// </summary>
-        private void GameClearTalk()
+        /// <param name="character">話すキャラクター</param>
+        private List<Tween> SwitchFaceWindow(TalkCharacter character)
         {
-            var sequence = TalkStart();
+            // 新しくアクティブにしたいウィンドウ
+            var newFaceWindow = faceWindowMap[character];
 
-            _messege = "ソフィー、敵戦艦動力部の破壊に成功した。";
-            sequence
-                .Append(talkWindowUICanvasGroup.DOFade(1f, 0.5f))
-                .Join(roydFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f);
+            var fadeList = new List<Tween>();
 
-            _messege = "ありがとうロイド、これであとは主力部隊が敵戦艦の破壊を実施できるわ。あなたはここから帰還して。";
-            sequence
-                .Append(roydFaceWindowCanvasGroup.DOFade(0f, 0.5f))
-                .Append(sophieFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f);
+            // 既に何かアクティブなキャラウィンドウがあり、かつ別キャラならフェードアウト
+            if (currentActiveFace != null && currentActiveFace != newFaceWindow)
+            {
+                currentActiveFace.DOFade(0f, 0.3f);
+                fadeList.Add(currentActiveFace.DOFade(0f, 0.3f));
+            }
 
-            _messege = "了解、これより帰還する。";
-            sequence
-                .Append(sophieFaceWindowCanvasGroup.DOFade(0f, 0.5f))
-                .Append(roydFaceWindowCanvasGroup.DOFade(1f, 0.5f))
-                .Append(talkTextMeshPro.DOText(String.Empty, 0))
-                .Append(talkTextMeshPro.DOText(_messege, _messege.Length * _message_speed).SetEase(Ease.Linear))
-                .AppendInterval(0.5f)
-                .OnComplete(() => MessageBroker.Default.Publish(new GameClear(TalkEnum.TalkEnd)));
+            // 新しいキャラのウィンドウが非表示ならフェードイン
+            if (newFaceWindow.alpha < 1f)
+            {
+                newFaceWindow.DOFade(1f, 0.5f);
+                fadeList.Add(newFaceWindow.DOFade(1f, 0.5f));
+            }
 
-            Finalization(sequence);
+            currentActiveFace = newFaceWindow;
+            return fadeList;
         }
     }
 }

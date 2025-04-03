@@ -72,5 +72,13 @@ namespace Turret
 
             currentLaserLevel.Value += 1;
         }
+
+        /// <summary>
+        /// 最大レーザーレベルかどうか
+        /// </summary>
+        public bool IsMaxLaserLevel()
+        {
+            return currentLaserLevel.Value == maxLaserLevel;
+        }
     }
 }

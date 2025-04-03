@@ -4,6 +4,7 @@ using _RAYSER.Scripts.Score;
 using _RAYSER.Scripts.SubWeapon;
 using BGM.Volume;
 using MessagePipe;
+using Status;
 using VContainer;
 using VContainer.Unity;
 
@@ -18,6 +19,7 @@ namespace _RAYSER.Scripts.VContainer
             // 子のLifetimeScopeに同じVolumeDataとScoreDataを引き渡す
             builder.Register<VolumeData>(Lifetime.Singleton);
             builder.Register<ScoreData>(Lifetime.Singleton);
+            builder.Register<CurrentGameState>(Lifetime.Singleton);
 
             // MessagePipeの設定
             var messagePipeOptions = builder.RegisterMessagePipe();

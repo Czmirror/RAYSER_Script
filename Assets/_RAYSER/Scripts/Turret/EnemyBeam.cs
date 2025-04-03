@@ -9,6 +9,8 @@ namespace Turret
     /// </summary>
     public class EnemyBeam : MonoBehaviour, IDamageableToPlayer
     {
+        public System.Action OnDeactivation;
+
         [SerializeField] private Rigidbody _rigidbody;
 
         /// <summary>
@@ -26,33 +28,38 @@ namespace Turret
         /// </summary>
         [SerializeField] private float disappearTime = 5f;
 
-        /// <summary>
-        /// ビームの大元のゲームオブジェクト
-        /// </summary>
-        private GameObject rootObject;
+        private void OnEnable()
+        {
+            Invoke(nameof(Deactivate), 5f);
+        }
+
         public float AddDamage()
         {
             return damage;
         }
 
-        private void Start()
-        {
-            // _rigidbody.velocity = transform.forward.normalized * beamSpeed;
-            rootObject = transform.root.gameObject;
-            Destroy(rootObject, disappearTime);
-        }
-
         private void Update(){
-            _rigidbody.velocity = transform.forward.normalized * beamSpeed;
-            // transform.Translate(Vector3.forward * beamSpeed * Time.deltaTime);
+            _rigidbody.linearVelocity = transform.forward.normalized * beamSpeed;
         }
 
-        // private void OnTriggerEnter(Collider other)
-        // {
-        //     if (other.gameObject.TryGetComponent(out IDamageableToEnemy damagetarget))
-        //     {
-        //         Destroy(rootObject);
-        //     }
-        // }
+        private void Deactivate()
+        {
+            // 非アクティブ化処理
+            if (OnDeactivation != null)
+            {
+                // イベントを発火
+                OnDeactivation.Invoke();
+
+                // イベントのクリア
+                OnDeactivation = null;
+            }
+
+            gameObject.SetActive(false);
+        }
+
+        private void OnDisable()
+        {
+            CancelInvoke(); // 非アクティブ時にタイマーを解除
+        }
     }
 }

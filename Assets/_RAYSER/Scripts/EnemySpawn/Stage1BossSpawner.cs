@@ -1,4 +1,5 @@
 using System;
+using _RAYSER.Scripts.Event.Signal;
 using Event.Signal;
 using Status;
 using UI.Game;

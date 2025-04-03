@@ -76,6 +76,8 @@ namespace UI.Title
             storyCanvasGroup.alpha = 0;
             charactersCanvasGroup.alpha = 0;
             gameScreenCanvasGroup.alpha = 0;
+
+            manualRectTransform.position = UIPositionCalculator.CalculateCenterPosition(manualRectTransform);
         }
 
         private void Awake()

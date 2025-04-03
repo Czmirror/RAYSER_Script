@@ -30,7 +30,7 @@ namespace _RAYSER.Scripts.SubWeapon
 
             // 螺旋の移動方向を設定
             Vector3 spiralMovement = new Vector3(x, y, beamSpeed);
-            _rigidbody.velocity = transform.TransformDirection(spiralMovement);
+            _rigidbody.linearVelocity = transform.TransformDirection(spiralMovement);
         }
 
         public float AddDamage()

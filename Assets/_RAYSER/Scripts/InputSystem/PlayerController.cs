@@ -1,4 +1,5 @@
 using _RAYSER.Scripts.Bomb;
+using _RAYSER.Scripts.Event.Signal;
 using _RAYSER.Scripts.Item;
 using _RAYSER.Scripts.SubWeapon;
 using Event;
@@ -43,6 +44,14 @@ namespace InputSystem
         private void Awake()
         {
             _playerInputActions = new PlayerInputActions();
+
+            MessageBroker.Default.Receive<TutorialStart>()
+                .Subscribe(x =>
+                {
+                    _playerInputActions.Player.Enable();
+                    _playerInputActions.UI.Disable();
+                })
+                .AddTo(this);
 
             MessageBroker.Default.Receive<GameStartEventEnd>()
                 .Subscribe(x =>
@@ -140,12 +149,12 @@ namespace InputSystem
 
         private void OnFire(InputAction.CallbackContext obj)
         {
-            _turret.Fire();
+            _turret.StartShootingAsync();
         }
 
         private void OnFireStop(InputAction.CallbackContext obj)
         {
-            _turret.FireStop();
+            _turret.StopShooting();
         }
 
         private void OnMoveStop(InputAction.CallbackContext obj)

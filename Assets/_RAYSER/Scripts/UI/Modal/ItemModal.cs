@@ -128,9 +128,10 @@ namespace _RAYSER.Scripts.UI.Modal
                 // await _uiEffect.FadeIn(insideButtonsCanvasGroup, cts.Token);
 
                 //初期選択ボタンの再指定
-                MessageBroker.Default.Publish(new UISelectorSignal { forcusUIGameObject = firstFocusUI });
+                GameObject initialSelection = GetInitialSelection();
+                MessageBroker.Default.Publish(new UISelectorSignal { forcusUIGameObject = initialSelection });
                 EventSystem.current.SetSelectedGameObject(null);
-                EventSystem.current.SetSelectedGameObject(firstFocusUI);
+                EventSystem.current.SetSelectedGameObject(initialSelection);
             }
             catch (OperationCanceledException)
             {
@@ -149,6 +150,22 @@ namespace _RAYSER.Scripts.UI.Modal
         public bool IsActive
         {
             get { return this.gameObject.activeSelf; }
+        }
+
+        /// <summary>
+        /// contentTransform の子から、選択可能な ItemBuyButton を探し、なければ _closeButton を返す
+        /// </summary>
+        private GameObject GetInitialSelection()
+        {
+            foreach (Transform child in contentTransform)
+            {
+                var itemBuyButton = child.GetComponent<ItemBuyButton>();
+                if (itemBuyButton != null && itemBuyButton.IsSelectable)
+                {
+                    return itemBuyButton.gameObject;
+                }
+            }
+            return _closeButton.gameObject;
         }
     }
 }

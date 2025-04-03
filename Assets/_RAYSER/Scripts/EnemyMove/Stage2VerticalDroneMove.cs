@@ -1,4 +1,5 @@
 using System;
+using _RAYSER.Scripts.Event.Signal;
 using DG.Tweening;
 using Event.Signal;
 using Status;
@@ -53,6 +54,8 @@ namespace EnemyMove
         private void InitialMove()
         {
             gameObject.SetActive(true);
+
+            MessageBroker.Default.Publish(new Stage2VerticalDroneDanger());
 
             transform.DOLocalMoveY(movePositionY, moveInitialTime)
                 .Pause()

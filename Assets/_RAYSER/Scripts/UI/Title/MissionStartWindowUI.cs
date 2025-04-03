@@ -3,11 +3,13 @@ using System.Threading;
 using _RAYSER.Scripts.UI.Title;
 using Cysharp.Threading.Tasks;
 using Event.Signal;
+using MessagePipe;
 using Rayser.CustomEditor;
 using TMPro;
 using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using VContainer;
 using VRM;
 
 namespace _RAYSER.Scripts.UI
@@ -24,6 +26,8 @@ namespace _RAYSER.Scripts.UI
         private Vector2 _initialGameStartUISizeDelta = Vector2.zero;
         private Vector3 _initialMissionWindowPosition = Vector3.zero;
         private Vector2 _initialMissionWindowSizeDelta = Vector2.zero;
+
+        private IPublisher<TutorialDialogOpenSignal> _tutorialDialogOpenSignalPublisher;
 
         /// <summary>
         /// 会話シーンテキスト
@@ -89,6 +93,11 @@ namespace _RAYSER.Scripts.UI
         [SerializeField] private MissionStartTalk _missionStartTalk;
         [SerializeField] private SceneObject gameScene;
 
+        [Inject]
+        public void Construct(IPublisher<TutorialDialogOpenSignal> tutorialDialogOpenSignalPublisher)
+        {
+            _tutorialDialogOpenSignalPublisher = tutorialDialogOpenSignalPublisher;
+        }
         public UIActiveSetter UIActiveSetter
         {
             get => _iuiImplementation.UIActiveSetter;
@@ -139,12 +148,15 @@ namespace _RAYSER.Scripts.UI
             _uiEffect.SetAlphaZero(sophieTalkWindowCanvasGroup);
             _uiEffect.SetAlphaZero(roydFaceWindowCanvasGroup);
             _uiEffect.SetAlphaZero(sophieFaceWindowCanvasGroup);
+
+            gameStartUIRectTransform.position = UIPositionCalculator.CalculateCenterPosition(gameStartUIRectTransform);
         }
 
         public async UniTask ShowUI()
         {
             try
             {
+                _tutorialDialogOpenSignalPublisher.Publish(new TutorialDialogOpenSignal());
                 SetActive(true);
 
                 // ゲームパッドのキャンセルボタン受付
@@ -235,7 +247,10 @@ namespace _RAYSER.Scripts.UI
                 // ゲームパッドのキャンセルボタン受付解除
                 _gamePadCancelButtonAcceptance = false;
 
-                SceneManager.LoadScene(gameScene);
+                // SceneManager.LoadScene(gameScene);
+                Debug.Log("Load GameScene");
+                _tutorialDialogOpenSignalPublisher.Publish(new TutorialDialogOpenSignal());
+                Debug.Log("Publish TutorialDialogOpenSignal");
             }
         }
     }

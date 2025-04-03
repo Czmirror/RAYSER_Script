@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using _RAYSER.Scripts.Bomb;
+using _RAYSER.Scripts.Event.Signal;
 using Cysharp.Threading.Tasks;
 using Damage;
 using Event;
@@ -39,6 +40,8 @@ namespace Shield
         /// </summary>
         [SerializeField] private ReactiveProperty<float> shield = new ReactiveProperty<float>(100f);
 
+        public float CurrentShield => shield.Value;
+
         /// <summary>
         /// 外部参照用シールドUniRx
         /// </summary>
@@ -48,6 +51,11 @@ namespace Shield
         /// シールド最大値UniRx
         /// </summary>
         [SerializeField] private ReactiveProperty<float> maxShield = new ReactiveProperty<float>(100);
+
+        /// <summary>
+        /// シールド危険値現象判定値
+        /// </summary>
+        private float shieldDangerValue = 50;
 
         /// <summary>
         /// 外部参照用シールド最大値UniRx
@@ -73,6 +81,23 @@ namespace Shield
         /// ダメージ後無敵状態有効時間
         /// </summary>
         private float isDamageInvincibleTime = 3f;
+
+        /// <summary>
+        /// ローリング無敵状態UniRx
+        /// </summary>
+        [SerializeField] private ReactiveProperty<bool> isRollingInvincible = new ReactiveProperty<bool>(false);
+
+        /// <summary>
+        /// 外部参照用ローリング無敵状態UniRx
+        /// </summary>
+        public IObservable<bool> IsRollingInvincibleObservable => isRollingInvincible;
+
+        /// <summary>
+        /// ローリング無敵状態有効時間
+        /// </summary>
+        private float isRollingInvincibleTime = 0.5f;
+
+        private IDisposable rollingSubscription;
 
         private ISubscriber<BombActiveSignal> _bombActiveSubscriber;
 
@@ -138,6 +163,11 @@ namespace Shield
 
             MessageBroker.Default.Receive<PlayerShieldRecover>().Where(x => x.ShieldRecoverPoint > 0)
                 .Subscribe(x => ShieldRecover(x.ShieldRecoverPoint)).AddTo(this);
+
+            // ローリングシグナルを購読し、無敵時間を適用
+            rollingSubscription = MessageBroker.Default.Receive<RollingSignal>()
+                .Subscribe(_ => ApplyRollingInvincibility().Forget())
+                .AddTo(this);
         }
 
         public void ShieldReduction(float damage)
@@ -216,6 +246,11 @@ namespace Shield
                 return true;
             }
 
+            if (isRollingInvincible.Value)
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -236,7 +271,7 @@ namespace Shield
         }
 
         /// <summary>
-        /// 無敵処理
+        /// 被ダメージ無敵状態有効処理
         /// </summary>
         private async UniTaskVoid DamageInvincible(CancellationToken cancellationToken)
         {
@@ -245,6 +280,16 @@ namespace Shield
             isDamageInvincible.Value = false;
         }
 
+        /// <summary>
+        /// ローリング無敵状態有効処理
+        /// </summary>
+        private async UniTaskVoid ApplyRollingInvincibility()
+        {
+            Debug.Log("ApplyRollingInvincibility");
+            isRollingInvincible.Value = true;
+            await UniTask.Delay(TimeSpan.FromSeconds(isRollingInvincibleTime));
+            isRollingInvincible.Value = false;
+        }
 
         /// <summary>
         /// シールド回復処理
@@ -258,6 +303,23 @@ namespace Shield
             {
                 shield.Value = maxShield.Value;
             }
+        }
+
+        /// <summary>
+        /// シールド値が最大かどうか
+        /// </summary>
+        /// <returns></returns>
+        public bool IsShieldFull()
+        {
+            return shield.Value == maxShield.Value;
+        }
+
+        /// <summary>
+        /// シールド値が危険水準かどうか
+        /// </summary>
+        public bool IsShieldDanger()
+        {
+            return shield.Value < shieldDangerValue;
         }
     }
 }

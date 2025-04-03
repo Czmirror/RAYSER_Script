@@ -1,5 +1,7 @@
 using DG.Tweening;
 using Rayser.CustomEditor;
+using Status;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -32,6 +34,7 @@ namespace UI.Game
 
         private void GameRetry()
         {
+            MessageBroker.Default.Publish(new GameStatusReset());
             DOTween.Clear(true);
             SceneManager.LoadScene(titleScene);
         }

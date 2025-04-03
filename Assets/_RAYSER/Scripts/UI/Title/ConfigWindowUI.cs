@@ -95,6 +95,8 @@ namespace _RAYSER.Scripts.UI.Title
             _uiEffect.SetAlphaZero(headerImageCanvasGroup);
             _uiEffect.SetAlphaZero(insideButtonsCanvasGroup);
             _uiEffect.SetAlphaZero(contentCanvasGroup);
+
+            windowRectTransform.position = UIPositionCalculator.CalculateCenterPosition(windowRectTransform);
         }
 
         public async UniTask ShowUI()

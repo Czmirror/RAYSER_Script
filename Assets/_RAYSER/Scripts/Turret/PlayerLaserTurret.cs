@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Status;
 using Target;
 using UniRx;
@@ -59,6 +60,11 @@ namespace Turret
 
         private void Start()
         {
+            Initialize();
+        }
+
+        public void Initialize()
+        {
             _gameStatus.CurrentGameStateReactiveProperty
                 .Where(x => x == GameState.Gamestart)
                 .Subscribe(_ => isEvent = true)
@@ -112,14 +118,24 @@ namespace Turret
                 .AddTo(this);
         }
 
-        public void Fire()
+        public async UniTask StartShootingAsync()
         {
             isFire = true;
+            await UniTask.CompletedTask;
         }
 
-        public void FireStop()
+        public void StopShooting()
         {
             isFire = false;
+        }
+
+        /// <summary>
+        /// レーザーを有効にする
+        /// </summary>
+        public void LaserEnable()
+        {
+            isEvent = false;
+            gameObject.SetActive(true);
         }
 
         private void LaserShot()
@@ -166,6 +182,12 @@ namespace Turret
         public PlayerTargeting CurrentPlayerTargeting()
         {
             return _playerTargeting;
+        }
+
+        public async UniTask CleanupAsync()
+        {
+            Destroy(gameObject);
+            await UniTask.CompletedTask;
         }
     }
 }

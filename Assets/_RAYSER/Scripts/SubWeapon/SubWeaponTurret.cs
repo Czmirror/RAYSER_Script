@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using _RAYSER.Scripts.Event.Signal;
 using _RAYSER.Scripts.Item;
 using Cysharp.Threading.Tasks;
 using MessagePipe;
+using UniRx;
 using UnityEngine;
 
 namespace _RAYSER.Scripts.SubWeapon
@@ -39,8 +41,16 @@ namespace _RAYSER.Scripts.SubWeapon
             };
         }
 
+        public void SubWeaponEnable()
+        {
+            gameObject.SetActive(true);
+        }
+
         private void OnSubweaponUseSignal(SubweaponUseSignal signal)
         {
+            // gameobjectがアクティブでない場合は処理を行わない
+            if (!gameObject.activeSelf) return;
+
             if (subweaponActions.TryGetValue(signal.SubweaponUseType, out var action))
             {
                 action(firingCancellationTokenSource.Token).Forget();
@@ -85,6 +95,8 @@ namespace _RAYSER.Scripts.SubWeapon
 
                 // サブウェポン発射処理
                 action.Accept(subWeapon.subWeaponVisitor);
+
+                MessageBroker.Default.Publish(new SubWeaponFired());
 
                 // 次の発射まで待機
                 await UniTask.Delay(TimeSpan.FromSeconds(interval), cancellationToken: cancellationToken);

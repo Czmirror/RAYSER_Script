@@ -1,7 +1,6 @@
-using System;
+using System.Collections.Generic;
 using Event.Signal;
 using Target;
-using UI.Game;
 using UniRx;
 using UnityEngine;
 
@@ -24,40 +23,55 @@ namespace Turret
         /// <summary>
         /// 敵機のビームのゲームオブジェクト
         /// </summary>
-        [SerializeField] private GameObject enemyBeam;
+        [SerializeField] private EnemyBeam enemyBeamPrefab;
 
-        private bool IsShotStop = false;
+        /// <summary>
+        /// 発射点のリスト
+        /// </summary>
+        [SerializeField] private List<FirePoint> firePoints = new List<FirePoint>();
+
+        private TurretController _turretController;
 
         private void Start()
         {
             _enemyTarget.TargetInitialize(targetPlayer);
 
+            _turretController = new TurretController(
+                owner: gameObject,
+                enemyBeamPrefab: enemyBeamPrefab,
+                shotInterval: shotInterbalTime,
+                getPosition: () => firePoints.ConvertAll(fp => transform.TransformPoint(fp.Position)),
+                getRotation: () =>
+                {
+                    var currentTarget = _enemyTarget.CurrentTarget();
+                    if (currentTarget != null)
+                    {
+                        return firePoints.ConvertAll(fp =>
+                            Quaternion.LookRotation(currentTarget.transform.position - transform.TransformPoint(fp.Position))
+                        );
+                    }
+                    return firePoints.ConvertAll(fp => transform.rotation * Quaternion.Euler(fp.Rotation));
+                }
+            );
+
+            // メッセージ受信で発射開始
             MessageBroker.Default.Receive<Stage3Start>()
-                .Subscribe(_ => BossShotStart())
+                .Subscribe(_ => _turretController.StartShooting())
                 .AddTo(this);
 
+            // メッセージ受信で発射停止
             MessageBroker.Default.Receive<GameClear>()
-                .Subscribe(_ => IsShotStop = true)
+                .Subscribe(_ =>
+                {
+                    _turretController.StopShooting();
+                })
                 .AddTo(this);
         }
 
-        private void BossShotStart()
+        private void OnDestroy()
         {
-            Observable
-                .Interval(TimeSpan.FromSeconds(shotInterbalTime))
-                .Subscribe(_ => EnemyShot())
-                .AddTo(this);
-        }
-
-        private void EnemyShot()
-        {
-            if (IsShotStop)
-            {
-                return;
-            }
-
-            transform.LookAt(_enemyTarget.CurrentTarget().transform.position);
-            GameObject _shot = Instantiate(enemyBeam, transform.position, transform.rotation);
+            // TurretControllerのリソースを解放
+            _turretController?.Cleanup();
         }
     }
 }

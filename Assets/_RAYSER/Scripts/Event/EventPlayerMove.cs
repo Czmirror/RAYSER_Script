@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using _RAYSER.Scripts.Event.Signal;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Event.Signal;
@@ -24,6 +25,11 @@ namespace Event
         /// Stage3用イベントカメラ（自機の背後に設置）
         /// </summary>
         [SerializeField] private GameObject Stage3EventCamera;
+
+        /// <summary>
+        /// Stage3用カメラ（自機の背後に設置）
+        /// </summary>
+        [SerializeField] private GameObject Stage3PlayCamera;
 
         /// <summary>
         /// バーチャルカメラ上部（イベント）→自機を中心に表示するために使用
@@ -155,6 +161,8 @@ namespace Event
         /// </summary>
         private Vector3 stage3GorlRotation = new Vector3(-0, -180, 0);
 
+
+
         private void Start()
         {
             _gameStatus.CurrentGameStateReactiveProperty
@@ -183,6 +191,10 @@ namespace Event
                     x == GameState.Stage2Boss
                 )
                 .Subscribe(_ => Stage2Boss())
+                .AddTo(this);
+
+            MessageBroker.Default.Receive<Stage2BossPatternChange>()
+                .Subscribe(_ => Stage2BossPatternChange())
                 .AddTo(this);
 
             _gameStatus.CurrentGameStateReactiveProperty
@@ -258,6 +270,12 @@ namespace Event
             VirtualCameraSideStage2Boss.SetActive(true);
         }
 
+        private void Stage2BossPatternChange()
+        {
+            VirtualCameraSideStage2Boss.SetActive(false);
+            VirtualCameraSide.SetActive(true);
+        }
+
         private async UniTaskVoid Stage3IntervalEventStart(CancellationToken cancellationToken)
         {
             VirtualCameraSide.SetActive(false);
@@ -295,6 +313,7 @@ namespace Event
             VirtualCameraBehind.transform.rotation = Stage3EventCamera.transform.rotation;
 
             // イベントカメラをCinemachineのバーチャルカメラに戻す
+            // Stage3PlayCamera.SetActive(true);
             MainCamera.SetActive(true);
             Stage3EventCamera.SetActive(false);
 

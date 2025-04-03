@@ -11,5 +11,10 @@ namespace Shield
         /// 機体破壊処理
         /// </summary>
         void FuselageDestruction();
+
+        /// <summary>
+        /// 現在のシールドのプロパティ
+        /// </summary>
+        float CurrentShield { get; }
     }
 }

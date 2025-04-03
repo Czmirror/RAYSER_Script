@@ -1,7 +1,7 @@
-namespace Event.Signal
+namespace _RAYSER.Scripts.Event.Signal
 {
     public class Warning
     {
-        
+
     }
 }

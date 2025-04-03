@@ -1,4 +1,5 @@
 using System;
+using _RAYSER.Scripts.Event.Signal;
 using Capsule;
 using DG.Tweening;
 using Event.Signal;

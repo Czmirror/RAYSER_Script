@@ -10,6 +10,9 @@ namespace Capsule
     /// </summary>
     public class CapsuleLaserPowerUp : MonoBehaviour, ICapsuleinfo
     {
+        [SerializeField] private string _name = "LaserPowerUp";
+        public string Name => _name;
+
         [SerializeField] private CapsuleEnum capsuleEnum = CapsuleEnum.LaserPowerUp;
         [SerializeField] private AudioSource _audioSource;
 

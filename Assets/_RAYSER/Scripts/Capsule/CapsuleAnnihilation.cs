@@ -12,6 +12,9 @@ namespace Capsule
     /// </summary>
     public class CapsuleAnnihilation : MonoBehaviour, ICapsuleinfo
     {
+        [SerializeField] private string _name = "AnnihilationEnemy";
+        public string Name => _name;
+
         [SerializeField] private CapsuleEnum capsuleEnum = CapsuleEnum.AnnihilationEnemy;
 
         public void CapsuleRecovery()

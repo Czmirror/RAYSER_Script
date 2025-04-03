@@ -87,11 +87,6 @@ namespace _RAYSER.Scripts.UI.Title
 
             InitializeUI();
 
-            foreach (var button in buttons)
-            {
-                MessageBroker.Default.Publish(new UISelectorSignal { forcusUIGameObject = button.gameObject });
-            }
-
             // UI無効
             // SetActive(false);
 
@@ -151,6 +146,8 @@ namespace _RAYSER.Scripts.UI.Title
             _uiEffect.SetAlphaZero(contentCanvasGroup);
             _uiEffect.SetAlphaZero(backImageCanvasGroup);
             itemModal.Hide();
+
+            windowRectTransform.position = UIPositionCalculator.CalculateCenterPosition(windowRectTransform);
         }
 
         /// <summary>
@@ -167,9 +164,13 @@ namespace _RAYSER.Scripts.UI.Title
 
             if (!interactable && gameObject.activeSelf)
             {
+                // ショップボタンフォーカス有効化&フォーカス処理
                 MessageBroker.Default.Publish(new UISelectorSignal { forcusUIGameObject = firstFocusUI });
                 EventSystem.current.SetSelectedGameObject(null);
                 EventSystem.current.SetSelectedGameObject(firstFocusUI);
+
+                // 閉じるボタンフォーカス有効化
+                MessageBroker.Default.Publish(new UISelectorSignal { forcusUIGameObject = _closeButton.gameObject });
             }
         }
 
@@ -177,7 +178,6 @@ namespace _RAYSER.Scripts.UI.Title
         {
             try
             {
-                MessageBroker.Default.Publish(new ScoreAccumulation { Score = 1000000 });
                 SetActive(true);
                 InitializeUI();
 

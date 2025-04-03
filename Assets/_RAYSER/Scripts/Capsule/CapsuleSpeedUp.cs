@@ -10,6 +10,8 @@ namespace Capsule
     /// </summary>
     public class CapsuleSpeedUp : MonoBehaviour, ICapsuleinfo
     {
+        [SerializeField] private  string _name = "SpeedUp";
+        public string Name => _name;
         [SerializeField] private CapsuleEnum capsuleEnum = CapsuleEnum.SpeedUp;
         [SerializeField] private AudioSource _audioSource;
 

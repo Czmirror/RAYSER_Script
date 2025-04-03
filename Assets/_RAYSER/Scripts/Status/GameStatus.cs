@@ -1,8 +1,10 @@
+using _RAYSER.Scripts.Event.Signal;
 using Event;
 using Event.Signal;
 using UI.Game;
 using UniRx;
 using UnityEngine;
+using VContainer;
 
 namespace Status
 {
@@ -26,6 +28,8 @@ namespace Status
     /// </summary>
     public class GameStatus : MonoBehaviour
     {
+        [Inject] private GameStateService gameStateService;
+
         /// <summary>
         /// エディタ把握用パラメーター
         /// </summary>
@@ -40,7 +44,22 @@ namespace Status
 
         private void Start()
         {
-            SetGameStatus(GameState.Gamestart);
+            if (gameStateService != null && gameStateService.GetGameStatus() == GameState.Stage2)
+            {
+                SetGameStatus(GameState.Stage2Interval);
+            }
+            else if (gameStateService != null && gameStateService.GetGameStatus() == GameState.Stage3)
+            {
+                SetGameStatus(GameState.Stage3Interval);
+            }
+            else
+            {
+                SetGameStatus(GameState.Gamestart);
+            }
+            // SetGameStatus(GameState.Gamestart);
+
+            MessageBroker.Default.Receive<TutorialMove>().Subscribe(_ => SetGameStatus(GameState.Tutorial))
+                .AddTo(this);
 
             MessageBroker.Default.Receive<GameStartEventEnd>().Subscribe(_ => SetGameStatus(GameState.Stage1))
                 .AddTo(this);

@@ -53,6 +53,11 @@ namespace Status
         /// <summary>
         /// ゲームオーバー
         /// </summary>
-        Gameover
+        Gameover,
+
+        /// <summary>
+        /// チュートリアル
+        /// </summary>
+        Tutorial
     }
 }

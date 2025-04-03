@@ -1,5 +1,7 @@
 using System;
+using _RAYSER.Scripts.Event.Signal;
 using MessagePipe;
+using UniRx;
 using UnityEngine;
 
 namespace _RAYSER.Scripts.Bomb
@@ -24,11 +26,16 @@ namespace _RAYSER.Scripts.Bomb
             // SubscribeメソッドでサブスクリプションをDisposableBagに追加
             _bombUseSignalSubscriber.Subscribe(signal =>
             {
+                // gameobjectがアクティブでない場合は処理を行わない
+                if (!gameObject.activeSelf) return;
+
                 Debug.Log("BombTurret: ボム使用シグナルを受け取りました");
                 if (_bombVisitor.CanUse())
                 {
                     Debug.Log("BombTurret: ボムを使用します");
                     var bombAction = new BombAction(transform.position);
+
+                    MessageBroker.Default.Publish(new BombUsed());
                     bombAction.Accept(_bombVisitor);
                 }
             }).AddTo(d);
@@ -40,10 +47,25 @@ namespace _RAYSER.Scripts.Bomb
             _bombUseSignalSubscriberDisposable?.Dispose();
         }
 
+        public void BombEnable()
+        {
+            gameObject.SetActive(true);
+        }
+
         private void OnDestroy()
         {
             // コンポーネントが破棄されるときに、Disposeメソッドを呼び出してリソースを解放する
             Dispose();
+        }
+
+        public void BombActivate()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void BombDeactivate()
+        {
+            gameObject.SetActive(false);
         }
     }
 }

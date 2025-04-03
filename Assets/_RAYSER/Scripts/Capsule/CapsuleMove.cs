@@ -14,13 +14,13 @@ namespace Capsule
         /// <summary>
         /// カプセル自動消滅時間
         /// </summary>
-        private float automaticExtinguishingTime = 20f;
+        private float automaticExtinguishingTime = 30f;
 
         /// <summary>
         /// カプセル移動速度
         /// </summary>
         private float capsuleMoveSpeedStage2 = 0.1f;
-        private float capsuleMoveSpeedStage3 = 1f;
+        private float capsuleMoveSpeedStage3 = 0.5f;
 
         public void Initialize(GameState gameState)
         {

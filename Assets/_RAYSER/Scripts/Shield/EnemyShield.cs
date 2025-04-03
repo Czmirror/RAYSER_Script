@@ -30,6 +30,7 @@ namespace Shield
         [SerializeField] private GameObject explosionDamage;
 
         [SerializeField] private float shield = 1;
+        public float CurrentShield => shield;
 
         public void ShieldReduction(float damage)
         {

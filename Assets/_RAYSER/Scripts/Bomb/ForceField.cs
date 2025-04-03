@@ -12,8 +12,8 @@ namespace _RAYSER.Scripts.Bomb
     public class ForceField : IBombVisitor
     {
         private BombPrefab forceFieldPrefab;
-        private int useCount = 3;
-        private int maxUseCount = 3;
+        private int useCount = 5;
+        private int maxUseCount = 5;
         private float duration = 5.0f;
         private DateTime lastUseTime = DateTime.MinValue;
         private BombPrefab currentInstance;

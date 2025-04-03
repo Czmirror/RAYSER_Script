@@ -31,5 +31,13 @@ namespace PlayerMove
 
             speedLevel += 1;
         }
+
+        /// <summary>
+        /// 最大スピードレベルかどうか
+        /// </summary>
+        public bool IsMaxSpeedLevel()
+        {
+            return speedLevel == maxSpeedLevel;
+        }
     }
 }

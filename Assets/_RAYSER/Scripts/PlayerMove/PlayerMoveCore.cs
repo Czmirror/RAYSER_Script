@@ -1,5 +1,4 @@
 using System;
-using Event;
 using Event.Signal;
 using Status;
 using UniRx;
@@ -30,7 +29,8 @@ namespace PlayerMove
         /// <summary>
         /// 設定中のスピードレベルクラス
         /// </summary>
-        [SerializeField] private PlayerSpeedLevel _playerSpeedLevelLevel = new PlayerSpeedLevel();
+        [SerializeField] private PlayerSpeedLevel _playerSpeedLevel = new PlayerSpeedLevel();
+        public PlayerSpeedLevel PlayerSpeedLevel => _playerSpeedLevel;
 
         /// <summary>
         /// スピードレベルUniRx
@@ -47,8 +47,16 @@ namespace PlayerMove
         /// </summary>
         [SerializeField] private IMovable currentMoveType;
 
+
+        [SerializeField] private FrontViewTiltHandler _tiltHandler;
+
         private void Start()
         {
+            _gameStatus.CurrentGameStateReactiveProperty
+                .Where(x => x == GameState.Tutorial)
+                .Subscribe(_ => TopViewMoveSwitch())
+                .AddTo(this);
+
             _gameStatus.CurrentGameStateReactiveProperty
                 .Where(x => x == GameState.Stage1)
                 .Subscribe(_ => TopViewMoveSwitch())
@@ -94,8 +102,8 @@ namespace PlayerMove
 
         private void SpeedLevelUp()
         {
-            _playerSpeedLevelLevel.SpeedLevelUp();
-            currentSpeedLevel.Value = _playerSpeedLevelLevel.CurrentSpeedLevel();
+            _playerSpeedLevel.SpeedLevelUp();
+            currentSpeedLevel.Value = _playerSpeedLevel.CurrentSpeedLevel();
         }
 
         public void SetDirection(Vector2 moveValue)
@@ -135,7 +143,7 @@ namespace PlayerMove
         /// <returns>現在のスピードレベル</returns>
         public int CurrentSpeedLevel()
         {
-            return _playerSpeedLevelLevel.CurrentSpeedLevel();
+            return _playerSpeedLevel.CurrentSpeedLevel();
         }
 
         /// <summary>
@@ -171,6 +179,7 @@ namespace PlayerMove
         {
             currentMoveType = new FrontViewMove();
             currentMoveType.Initialize(this);
+            ((FrontViewMove) currentMoveType).SetFrontViewTiltHandler(_tiltHandler);
         }
     }
 }

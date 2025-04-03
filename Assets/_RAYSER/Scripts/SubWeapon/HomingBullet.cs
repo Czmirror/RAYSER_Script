@@ -42,11 +42,11 @@ namespace _RAYSER.Scripts.SubWeapon
             if (target != null)
             {
                 Vector3 direction = (target.position - transform.position).normalized;
-                _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, direction * beamSpeed, homingSensitivity * Time.deltaTime);
+                _rigidbody.linearVelocity = Vector3.Lerp(_rigidbody.linearVelocity, direction * beamSpeed, homingSensitivity * Time.deltaTime);
             }
             else
             {
-                _rigidbody.velocity = transform.forward * beamSpeed;
+                _rigidbody.linearVelocity = transform.forward * beamSpeed;
             }
         }
 

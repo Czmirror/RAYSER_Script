@@ -1,4 +1,5 @@
 using System;
+using _RAYSER.Scripts.Event.Signal;
 using DG.Tweening;
 using Event.Signal;
 using Status;
@@ -48,9 +49,11 @@ namespace EnemyMove
 
             gameObject.SetActive(false);
 
-            Observable.Timer(TimeSpan.FromSeconds(spawnTime))
-                .Where(_ => _gameStatus.CurrentGameState == GameState.Stage1)
-                .Subscribe(_ => { Stage1MiniBossInitialMove(); })
+            _gameStatus.CurrentGameStateReactiveProperty
+                .Where(x =>
+                    x == GameState.Stage1Boss
+                )
+                .Subscribe(_ => Stage1MiniBossInitialMove())
                 .AddTo(this);
         }
 

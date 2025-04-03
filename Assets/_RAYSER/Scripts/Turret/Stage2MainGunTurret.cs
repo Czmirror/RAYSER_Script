@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using Event.Signal;
 using Target;
 using UniRx;
 using UnityEngine;
@@ -18,26 +19,38 @@ namespace Turret
         /// <summary>
         /// 敵機のビームのゲームオブジェクト
         /// </summary>
-        [SerializeField] private GameObject enemyBeam;
+        [SerializeField] private EnemyBeam enemyBeamPrefab;
+
+        private TurretController _turretController;
 
         [SerializeField] private GameObject target = null;
 
         [SerializeField] private EnemyLockOn _enemyLockOn;
 
+        /// <summary>
+        /// 発射点のリスト
+        /// </summary>
+        [SerializeField] private List<FirePoint> firePoints = new List<FirePoint>();
+
         private void Start()
         {
-            Observable
-                .Interval(TimeSpan.FromSeconds(shotInterbalTime))
-                .Subscribe(_ => { EnemyShot(); }).AddTo(this);
+            _turretController = new TurretController(
+                owner: gameObject,
+                enemyBeamPrefab: enemyBeamPrefab,
+                shotInterval: shotInterbalTime,
+                getPosition: () => firePoints.ConvertAll(fp => transform.TransformPoint(fp.Position)),
+                getRotation: () => firePoints.ConvertAll(fp => transform.rotation * Quaternion.Euler(fp.Rotation))
+                );
+
+            MessageBroker.Default.Receive<Stage2Start>()
+                .Subscribe(_ => _turretController.StartShooting())
+                .AddTo(this);
         }
 
-        private void EnemyShot()
+        private void OnDestroy()
         {
-            if (_enemyLockOn.CurrentTarget() == null)
-            {
-                return;
-            }
-            GameObject _shot = Instantiate(enemyBeam, transform.position, transform.rotation);
+            // TurretControllerのリソースを解放
+            _turretController?.Cleanup();
         }
     }
 }

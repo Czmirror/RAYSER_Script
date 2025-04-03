@@ -6,6 +6,7 @@ using MessagePipe;
 using TMPro;
 using UniRx;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace _RAYSER.Scripts.Item
@@ -13,13 +14,14 @@ namespace _RAYSER.Scripts.Item
     /// <summary>
     /// カスタマイズ画面アイテム購入ボタンUIクラス
     /// </summary>
-    public class ItemBuyButton : MonoBehaviour
+    public class ItemBuyButton : MonoBehaviour, ISelectHandler
     {
         [SerializeField] private TextMeshProUGUI itemNameText;
         [SerializeField] private Image thumbnailImage;
         [SerializeField] private TextMeshProUGUI priceText;
         [SerializeField] private TextMeshProUGUI getText;
         [SerializeField] private Button button;
+        [SerializeField] private ScrollRect scrollRect;
 
         private ItemData itemData;
         public int Id { get; set; }
@@ -35,9 +37,25 @@ namespace _RAYSER.Scripts.Item
         /// </summary>
         private bool isDialogOpen = false;
 
+        /// <summary>
+        /// ボタンが選択可能かどうか
+        /// </summary>
+        public bool IsSelectable => button != null && button.interactable;
+
         private void OnEnable()
         {
             MessageBroker.Default.Publish(new UISelectorSignal { forcusUIGameObject = gameObject });
+        }
+
+        public void OnSelect(BaseEventData eventData)
+        {
+            // AutoScrollVerticalコンポーネントを取得し、スクロール処理を実行
+            AutoScrollVertical autoScroll = scrollRect.GetComponent<AutoScrollVertical>();
+
+            if (autoScroll != null)
+            {
+                autoScroll.ScrollToSelectedItem(GetComponent<RectTransform>());
+            }
         }
 
         public void Setup(
@@ -45,11 +63,13 @@ namespace _RAYSER.Scripts.Item
             IPublisher<DialogOpenSignal> itemPurchasePublisher,
             ScoreData scoreData,
             ItemDialog itemDialog,
-            ItemAcquisition itemAcquisition
+            ItemAcquisition itemAcquisition,
+            ScrollRect scrollRectI
         )
         {
             _itemPurchasePublisher = itemPurchasePublisher;
             _itemAcquisition = itemAcquisition;
+            scrollRect = scrollRectI;
 
             if (item is ItemData data) // セーフキャストを使用
             {

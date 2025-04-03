@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e30016d90adb41b7974fdd6ccf0bcd55, type: 3}
+  m_Name: stage2IntervalConversation
+  m_EditorClassIdentifier: 
+  sentences:
+  - Character: 0
+    Message: "\u30BD\u30D5\u30A3\u30FC\u3001\u3053\u306E\u8FBA\u308A\u306E\u6575\u52E2\u529B\u3092\u6483\u7834\u3057\u305F\u3002"
+  - Character: 1
+    Message: "\u4E86\u89E3\u30ED\u30A4\u30C9\u3001\u305D\u308C\u3067\u306F\u6B66\u88C5\u306E\u5C11\u306A\u3044\u6575\u6226\u8266\u306E\u5074\u90E8\u304B\u3089\u56DE\u308A\u8FBC\u3093\u3067\u3001\u6226\u8266\u306E\u5F8C\u65B9\u90E8\u3078\u5411\u304B\u3063\u3066\u3002"
+  - Character: 0
+    Message: "\u4E86\u89E3\u3001\u3053\u308C\u3088\u308A\u6575\u6226\u8266\u5074\u90E8\u304B\u3089\u4FB5\u653B\u3092\u958B\u59CB\u3059\u308B\u3002"
+  targetName: 

@@ -39,8 +39,8 @@ namespace _RAYSER.Scripts.SubWeapon
                 var itemAcquisition = container.Resolve<ItemAcquisition>();
                 itemAcquisition.debugAddItem(vulcan);
                 itemAcquisition.debugAddItem(threeWay);
-                itemAcquisition.debugAddItem(homing);
-                itemAcquisition.debugAddItem(spiral);
+                // itemAcquisition.debugAddItem(homing);
+                // itemAcquisition.debugAddItem(spiral);
 
                 var subweaponUseSignalSubscriber = container.Resolve<ISubscriber<SubweaponUseSignal>>();
                 subWeaponTurret.Setup(subweaponUseSignalSubscriber, itemAcquisition);
